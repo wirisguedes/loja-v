@@ -1,6 +1,7 @@
 package com.loja_v.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 import javax.persistence.Column;
@@ -17,27 +18,25 @@ import javax.persistence.Table;
 
 
 @Entity
-@Table(name = "nota_item_produto")
-@SequenceGenerator(name = "seq_nota_item_produto", sequenceName = "seq_nota_item_produto", allocationSize = 1, initialValue = 1)
-public class NotaItemProduto implements Serializable{
-	
-	
+@Table(name = "item_venda_loja")
+@SequenceGenerator(name = "seq_item_venda_loja", sequenceName = "seq_item_venda_loja", allocationSize = 1, initialValue = 1)
+public class ItemVendaLoja implements Serializable{
+
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_nota_item_produto")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_item_venda_loja")
 	private Long id;
 	
-	@Column(nullable = false)
 	private Double quantidade;
-	
-	@ManyToOne
-	@JoinColumn(name = "nota_fiscal_compra_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "nota_fiscal_compra_fk"))
-	private NotaFiscalCompra notaFiscalCompra;
 	
 	@ManyToOne
 	@JoinColumn(name = "produto_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "produto_fk"))
 	private Produto produto;
+	
+	@ManyToOne
+	@JoinColumn(name = "venda_compra_loja_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "venda_compra_loja_fk"))
+	private VendaCompraLoja vendaCompraLoja;
 
 	public Long getId() {
 		return id;
@@ -55,20 +54,20 @@ public class NotaItemProduto implements Serializable{
 		this.quantidade = quantidade;
 	}
 
-	public NotaFiscalCompra getNotaFiscalCompra() {
-		return notaFiscalCompra;
-	}
-
-	public void setNotaFiscalCompra(NotaFiscalCompra notaFiscalCompra) {
-		this.notaFiscalCompra = notaFiscalCompra;
-	}
-
 	public Produto getProduto() {
 		return produto;
 	}
 
 	public void setProduto(Produto produto) {
 		this.produto = produto;
+	}
+
+	public VendaCompraLoja getVendaCompraLoja() {
+		return vendaCompraLoja;
+	}
+
+	public void setVendaCompraLoja(VendaCompraLoja vendaCompraLoja) {
+		this.vendaCompraLoja = vendaCompraLoja;
 	}
 
 	@Override
@@ -84,8 +83,12 @@ public class NotaItemProduto implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		NotaItemProduto other = (NotaItemProduto) obj;
+		ItemVendaLoja other = (ItemVendaLoja) obj;
 		return Objects.equals(id, other.id);
 	}
-
+	
+	
+	
+	
+	
 }
