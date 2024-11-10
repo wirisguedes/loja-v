@@ -23,13 +23,13 @@ public class Acesso implements GrantedAuthority {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_acesso")
 	private Long id;
 	
-	@Column(name = "decricao", nullable = false)
-	private String decricao; //Acesso ex ROLE_ADMIN
+	@Column(name = "descricao", nullable = false)
+	private String descricao; //Acesso ex ROLE_ADMIN
 
 	@Override
 	public String getAuthority() {
 		
-		return this.decricao;
+		return this.descricao;
 	}
 
 	public Long getId() {
@@ -40,12 +40,12 @@ public class Acesso implements GrantedAuthority {
 		this.id = id;
 	}
 
-	public String getDecricao() {
-		return decricao;
+	public String getDescricao() {
+		return descricao;
 	}
 
-	public void setDecricao(String decricao) {
-		this.decricao = decricao;
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
 	}
 
 	@Override
