@@ -1,5 +1,6 @@
 package com.loja_v.security;
 
+import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,8 +16,10 @@ import com.loja_v.ApplicationContextLoad;
 import com.loja_v.model.Usuario;
 import com.loja_v.repository.UsuarioRepository;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
 
 /*Criar a autenticação e retonar também a autenticação JWT*/
 @Service
@@ -59,9 +62,11 @@ public class JWTTokenAutenticacaoService {
 	
 	
 	/*Retorna o usuário validado com token ou caso nao seja valido retona null*/
-	public Authentication getAuthetication(HttpServletRequest request, HttpServletResponse response) {
+	public Authentication getAuthetication(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		
 		String token = request.getHeader(HEADER_STRING);
+		
+		try {
 		
 		if (token != null) {
 			
@@ -90,7 +95,15 @@ public class JWTTokenAutenticacaoService {
 			
 		}
 		
-		liberacaoCors(response);
+		
+		}catch (SignatureException e) {
+			response.getWriter().write("* Token inválido");
+		}catch(ExpiredJwtException e) {
+			response.getWriter().write("* Token expirado, efetue o login novamente");
+		}
+		finally {
+			liberacaoCors(response);
+		}
 		return null;
 	}
 	
