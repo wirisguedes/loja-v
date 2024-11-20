@@ -1,10 +1,12 @@
 package com.loja_v;
 
+import java.util.Calendar;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -23,6 +25,7 @@ import com.loja_v.service.AcessoService;
 
 import junit.framework.TestCase;
 
+@Profile("test")
 @SpringBootTest(classes = LojaVApplication.class)
 class LojaVApplicationTests extends TestCase{
 
@@ -46,7 +49,7 @@ class LojaVApplicationTests extends TestCase{
 		
 		Acesso acesso = new Acesso();
 		
-		acesso.setDescricao("ROLE_COMPRADOR");
+		acesso.setDescricao("ROLE_COMPRADOR" + Calendar.getInstance().getTimeInMillis());
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		
@@ -108,10 +111,11 @@ class LojaVApplicationTests extends TestCase{
 									.content(objectMapper.writeValueAsString(acesso))
 									.accept(MediaType.APPLICATION_JSON)
 									.contentType(MediaType.APPLICATION_JSON));
-		
-		System.out.println("Retorno API: " + retornoApi.andReturn().getResponse().getContentAsString());
-		
-		assertEquals("Acesso removido", retornoApi.andReturn().getResponse().getContentAsString());
+
+		System.out.println("Retorno da API: " + retornoApi.andReturn().getResponse().getContentAsString());
+		System.out.println("Status de retorno: " + retornoApi.andReturn().getResponse().getStatus());
+
+		assertEquals("Acesso Removido", retornoApi.andReturn().getResponse().getContentAsString());
 		assertEquals(200, retornoApi.andReturn().getResponse().getStatus());
 	
 	}
@@ -179,17 +183,19 @@ class LojaVApplicationTests extends TestCase{
 	}
 	
 	@Test
-	public void testCadastraAcesso() {
+	public void testCadastraAcesso() throws ExceptionLoja {
+		
+		String descAcesso = "ROLE_ADMIN" + Calendar.getInstance().getTimeInMillis();
 		
 		Acesso acesso = new Acesso();
 		
-		acesso.setDescricao("ROLE_ADMIN");
+		acesso.setDescricao(descAcesso);
 		
 		acesso = acessoController.salvarAcesso(acesso).getBody();
 		
 		assertEquals(true, acesso.getId() > 0);
 		
-		assertEquals("ROLE_ADMIN", acesso.getDescricao());
+		assertEquals(descAcesso, acesso.getDescricao());
 		
 		/*Test de carregamento*/
 		Acesso acesso2 = acessoRepository.findById(acesso.getId()).get();

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.loja_v.ExceptionLoja;
 import com.loja_v.model.Acesso;
 import com.loja_v.repository.AcessoRepository;
 import com.loja_v.service.AcessoService;
@@ -31,7 +32,14 @@ public class AcessoController {
 	
 	@ResponseBody //Poder da um retorno da API
 	@PostMapping(value = "**/salvarAcesso") // Mapeando a url para receber JSON
-	public ResponseEntity<Acesso> salvarAcesso(@RequestBody Acesso acesso) { //Recebe o JSON e converte para objeto
+	public ResponseEntity<Acesso> salvarAcesso(@RequestBody Acesso acesso) throws ExceptionLoja { //Recebe o JSON e converte para objeto
+		
+		if(acesso.getId() == null) {
+			List<Acesso> acessos = acessoRepository.buscarAcessoDesc(acesso.getDescricao().toUpperCase());
+			if(!acessos.isEmpty()) {
+				throw new ExceptionLoja("Já existe acesso com a descrição: " + acesso.getDescricao());
+			}
+		}
 		
 		Acesso acessoSalvo = acessoService.save(acesso);
 		return new ResponseEntity<Acesso>(acessoSalvo, HttpStatus.OK);
@@ -46,20 +54,25 @@ public class AcessoController {
 	}
 	
 	
-	@Secured({"ROLE_GERENTE", "ROLE_ADMIN"})
+	//@Secured({"ROLE_GERENTE", "ROLE_ADMIN"})
 	@ResponseBody 
 	@DeleteMapping(value = "**/deletaAcessoPorId/{id}") 
 	public ResponseEntity<?> deletaAcessoPorId(@PathVariable("id") Long id) { 
 		
 		acessoRepository.deleteById(id);
-		return new ResponseEntity("Acesso removido", HttpStatus.OK);
+		return new ResponseEntity("Acesso Removido", HttpStatus.OK);
 	}
 	
 	@ResponseBody 
 	@GetMapping(value = "**/obterAcessoPorId/{id}") 
-	public ResponseEntity<Acesso> obterAcessoPorId(@PathVariable("id") Long id) { 
+	public ResponseEntity<Acesso> obterAcessoPorId(@PathVariable("id") Long id) throws ExceptionLoja { 
 		
-		Acesso acesso = acessoRepository.findById(id).get();
+		Acesso acesso = acessoRepository.findById(id).orElse(null);
+		
+		if(acesso == null) {
+			throw new ExceptionLoja("Não encontrou acesso com código: " + id);
+		}
+		
 		return new ResponseEntity<Acesso>(acesso, HttpStatus.OK);
 	}
 	
@@ -67,7 +80,7 @@ public class AcessoController {
 	@GetMapping(value = "**/buscarPorDesc/{desc}") 
 	public ResponseEntity<List<Acesso>> buscarPorDesc(@PathVariable("desc") String desc) { 
 		
-		List<Acesso> acesso = acessoRepository.buscarAcessoDesc(desc);
+		List<Acesso> acesso = acessoRepository.buscarAcessoDesc(desc.toUpperCase());
 		
 		return new ResponseEntity<List<Acesso>>(acesso, HttpStatus.OK);
 	}

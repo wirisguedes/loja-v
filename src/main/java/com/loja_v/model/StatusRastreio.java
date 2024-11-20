@@ -38,6 +38,27 @@ public class StatusRastreio implements Serializable{
 	@ManyToOne
 	@JoinColumn(name = "venda_compra_loja_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "venda_compra_loja_fk"))
 	private VendaCompraLoja vendaCompraLoja;
+	
+	@ManyToOne(targetEntity = Pessoa.class)
+	@JoinColumn(name = "empresa_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_fk"))
+	private Pessoa empresa; 
+	
+
+	public VendaCompraLoja getVendaCompraLoja() {
+		return vendaCompraLoja;
+	}
+
+	public void setVendaCompraLoja(VendaCompraLoja vendaCompraLoja) {
+		this.vendaCompraLoja = vendaCompraLoja;
+	}
+
+	public Pessoa getEmpresa() {
+		return empresa;
+	}
+
+	public void setEmpresa(Pessoa empresa) {
+		this.empresa = empresa;
+	}
 
 	public Long getId() {
 		return id;
