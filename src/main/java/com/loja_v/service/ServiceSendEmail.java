@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 public class ServiceSendEmail {
 	
 	private String userName = "lojanamidia@gmail.com";
+	//usar Senha de App gmail
 	private String senha = "";
 	
 	@Async
@@ -55,13 +56,15 @@ public class ServiceSendEmail {
 		
 		Address[] toUser = InternetAddress.parse(emailDestino);
 		
+
 		Message message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(userName, "Loja V", "UTF-8"));
 		message.setRecipients(Message.RecipientType.TO, toUser);
 		message.setSubject(assunto);
-		message.setText(menssagem);
+		message.setContent(menssagem, "text/html; charset=utf-8");
 		
 		Transport.send(message);
+
 	}
 
 }

@@ -1,12 +1,14 @@
 package com.loja_v;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Profile;
 
+import com.github.javafaker.Faker;
 import com.loja_v.controller.PessoaController;
 import com.loja_v.enums.TipoEndereco;
 import com.loja_v.model.Endereco;
@@ -27,11 +29,11 @@ public class TestePessoaUsuario extends TestCase {
 	@Test
 	public void testCadPessoaFisica() throws ExceptionLoja {
 
-
+		Faker faker = new Faker(new Locale("pt-BR"));
 
 		PessoaJuridica pessoaJuridica = new PessoaJuridica();
 		pessoaJuridica.setCnpj("" + Calendar.getInstance().getTimeInMillis());
-		pessoaJuridica.setNome("Alex fernando");
+		pessoaJuridica.setNome(faker.name().firstName());
 		pessoaJuridica.setEmail("wirisguedes@gmail.com");
 		pessoaJuridica.setTelefone("45999795800");
 		pessoaJuridica.setInscEstadual("65556565656665");
@@ -61,7 +63,7 @@ public class TestePessoaUsuario extends TestCase {
 		endereco2.setPessoa(pessoaJuridica);
 		endereco2.setRuaLogra("Av. maringá");
 		endereco2.setTipoEndereco(TipoEndereco.ENTREGA);
-		endereco2.setUf("PR");
+		endereco2.setUf("TO");
 		endereco2.setCidade("Curitiba");
 		
 		pessoaJuridica.getEnderecos().add(endereco2);

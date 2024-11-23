@@ -1,5 +1,7 @@
 package com.loja_v.repository;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 
@@ -17,7 +19,9 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long>{
 	
 	@Query(value = "select u from Usuario u where u.login = ?1")
 	Usuario findUserByLogin(String login);
-
+	
+	@Query(value = "select u from Usuario u where u.dataAtualSenha <= current_date - 90")
+	List<Usuario> usuarioSenhaVencida();
 
 	@Query(value = "select u from Usuario u where u.pessoa.id = ?1 or u.login =?2")
 	Usuario findUserByPessoa(Long id, String email);
