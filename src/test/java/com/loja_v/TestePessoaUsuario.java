@@ -27,17 +27,18 @@ public class TestePessoaUsuario extends TestCase {
 	@Test
 	public void testCadPessoaFisica() throws ExceptionLoja {
 
+
+
 		PessoaJuridica pessoaJuridica = new PessoaJuridica();
-
 		pessoaJuridica.setCnpj("" + Calendar.getInstance().getTimeInMillis());
-		pessoaJuridica.setNome("Iris Guedes");
-		pessoaJuridica.setEmail("testSalvarPJ2@test.com");
-		pessoaJuridica.setTelefone("119842877");
-		pessoaJuridica.setInscEstadual("465454545");
-		pessoaJuridica.setInscMunicipal("4877878787");
-		pessoaJuridica.setNomeFantasia("Abc");
-		pessoaJuridica.setRazaoSocial("Abc");
-
+		pessoaJuridica.setNome("Alex fernando");
+		pessoaJuridica.setEmail("wirisguedes@gmail.com");
+		pessoaJuridica.setTelefone("45999795800");
+		pessoaJuridica.setInscEstadual("65556565656665");
+		pessoaJuridica.setInscMunicipal("55554565656565");
+		pessoaJuridica.setNomeFantasia("54556565665");
+		pessoaJuridica.setRazaoSocial("4656656566");
+		
 		Endereco endereco1 = new Endereco();
 		endereco1.setBairro("Jd Dias");
 		endereco1.setCep("556556565");
@@ -49,7 +50,8 @@ public class TestePessoaUsuario extends TestCase {
 		endereco1.setTipoEndereco(TipoEndereco.COBRANCA);
 		endereco1.setUf("PR");
 		endereco1.setCidade("Curitiba");
-
+		
+		
 		Endereco endereco2 = new Endereco();
 		endereco2.setBairro("Jd Maracana");
 		endereco2.setCep("7878778");
@@ -61,19 +63,21 @@ public class TestePessoaUsuario extends TestCase {
 		endereco2.setTipoEndereco(TipoEndereco.ENTREGA);
 		endereco2.setUf("PR");
 		endereco2.setCidade("Curitiba");
-
-		pessoaJuridica.getEnderecos().add(endereco1);
+		
 		pessoaJuridica.getEnderecos().add(endereco2);
+		pessoaJuridica.getEnderecos().add(endereco1);
+
 
 		pessoaJuridica = pessoaController.salvarPj(pessoaJuridica).getBody();
-
-		assertEquals(true, pessoaJuridica.getId() > 0);
-
+		
+		assertEquals(true, pessoaJuridica.getId() > 0 );
+		
 		for (Endereco endereco : pessoaJuridica.getEnderecos()) {
 			assertEquals(true, endereco.getId() > 0);
 		}
-
+		
 		assertEquals(2, pessoaJuridica.getEnderecos().size());
+
 
 	}
 

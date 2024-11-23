@@ -21,11 +21,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 
+
 @Service
 public class ServiceSendEmail {
 	
 	private String userName = "lojanamidia@gmail.com";
-	private String senha = "loja2024";
+	private String senha = "";
 	
 	@Async
 	public void enviarEmailHtml(String assunto, String menssagem, String emailDestino) throws UnsupportedEncodingException, MessagingException {
@@ -38,6 +39,7 @@ public class ServiceSendEmail {
 		properties.put("mail.smtp.port", "465");
 		properties.put("mail.smtp.socketFactory.port", "465");
 		properties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		properties.put("mail.debug", "true");
 		
 		Session session = Session.getInstance(properties, new Authenticator() {
 		      

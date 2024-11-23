@@ -35,21 +35,20 @@ public class PessoaUserService {
 		
 		
 		
-		for(int i = 0; i< pessoaJuridica.getEnderecos().size(); i++) {
+		for (int i = 0; i< pessoaJuridica.getEnderecos().size(); i++) {
 			pessoaJuridica.getEnderecos().get(i).setPessoa(pessoaJuridica);
 			pessoaJuridica.getEnderecos().get(i).setEmpresa(pessoaJuridica);
-			
 		}
 		
 		pessoaJuridica = pessoaRepository.save(pessoaJuridica);
 		
 		Usuario usuarioPj = usuarioRepository.findUserByPessoa(pessoaJuridica.getId(), pessoaJuridica.getEmail());
 		
-		if(usuarioPj == null) {
+		if (usuarioPj == null) {
 			
 			String constraint = usuarioRepository.consultaConstraintAcesso();
-			if(constraint != null) {
-				jdbcTemplate.execute("begin; alter table usuarios_acesso drop constraint " + constraint + "; commit;");
+			if (constraint != null) {
+				jdbcTemplate.execute("begin; alter table usuarios_acesso drop constraint " + constraint +"; commit;");
 			}
 			
 			usuarioPj = new Usuario();
@@ -66,24 +65,26 @@ public class PessoaUserService {
 			usuarioPj = usuarioRepository.save(usuarioPj);
 			
 			usuarioRepository.insereAcessoUserPj(usuarioPj.getId());
+			usuarioRepository.insereAcessoUserPj(usuarioPj.getId(), "ROLE_ADMIN");
 			
-			StringBuilder menssagemHtml  = new StringBuilder();
+			StringBuilder menssagemHtml = new StringBuilder();
 			
-			menssagemHtml.append("<b>Segue abaixo seus dados de acesso para a loja virtual</b>");
-			menssagemHtml.append("<b>Login: </b>"+pessoaJuridica.getEmail()+"</b><br/>");
+			menssagemHtml.append("<b>Segue abaixo seus dados de acesso para a loja virtual</b><br/>");
+			menssagemHtml.append("<b>Login: </b>"+pessoaJuridica.getEmail()+"<br/>");
 			menssagemHtml.append("<b>Senha: </b>").append(senha).append("<br/><br/>");
 			menssagemHtml.append("Obrigado!");
-
 			
 			try {
-				serviceSendEmail.enviarEmailHtml("Acesso gerado para Loja V", menssagemHtml .toString(), pessoaJuridica.getEmail());
-			} catch (Exception e) {
-				
+			  serviceSendEmail.enviarEmailHtml("Acesso Gerado para Loja Virtual", menssagemHtml.toString() , pessoaJuridica.getEmail());
+			  Thread.sleep(15000);
+			}catch (Exception e) {
 				e.printStackTrace();
-			} 
+			}
+			
 		}
 		
 		return pessoaJuridica;
+
 	}
 
 }
