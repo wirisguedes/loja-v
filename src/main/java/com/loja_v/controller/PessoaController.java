@@ -1,5 +1,7 @@
 package com.loja_v.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ public class PessoaController {
 	
 	@ResponseBody
 	@PostMapping(value = "**/salvarPj")
-	public ResponseEntity<PessoaJuridica> salvarPj(@RequestBody PessoaJuridica pessoaJuridica) throws ExceptionLoja{
+	public ResponseEntity<PessoaJuridica> salvarPj(@RequestBody @Valid PessoaJuridica pessoaJuridica) throws ExceptionLoja{
 		
 		if(pessoaJuridica == null) {
 			throw new ExceptionLoja("Pessoa Juridica não pode ser NULL");

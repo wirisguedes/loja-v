@@ -50,7 +50,7 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler{
 			for(ObjectError objectError : list) {
 				msg += objectError.getDefaultMessage() + "\n";
 			}
-		} if(ex instanceof HttpMessageNotReadableException) {
+		}else if(ex instanceof HttpMessageNotReadableException) {
 			
 			msg = "Não está sendo enviado dados para o BODY corpo da requisição";
 		}

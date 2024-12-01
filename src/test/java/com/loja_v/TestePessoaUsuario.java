@@ -99,7 +99,7 @@ public class TestePessoaUsuario extends TestCase {
 		
 		pessoaFisica.setCpf(faker.cpf().valid());
 		pessoaFisica.setNome(faker.name().firstName());
-		pessoaFisica.setEmail("wirisguedes4343434@gmail.com"); 
+		pessoaFisica.setEmail("wirisguedes@gmail.com"); 
 		pessoaFisica.setTelefone("45999795800");
 		pessoaFisica.setEmpresa(pessoaJuridica);
 				
