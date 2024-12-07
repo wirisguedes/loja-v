@@ -15,14 +15,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.loja_v.ExceptionLoja;
+import com.loja_v.enums.TipoPessoa;
 import com.loja_v.model.Endereco;
 import com.loja_v.model.PessoaFisica;
 import com.loja_v.model.PessoaJuridica;
 import com.loja_v.model.dto.CepDTO;
+import com.loja_v.model.dto.ConsultaCnpjDTO;
 import com.loja_v.repository.EnderecoRepository;
 import com.loja_v.repository.PessoaFisicaRepository;
 import com.loja_v.repository.PessoaRepository;
 import com.loja_v.service.PessoaUserService;
+import com.loja_v.service.ServiceContagemAcessoApi;
 import com.loja_v.util.ValidaCNPJ;
 import com.loja_v.util.ValidarCPF;
 
@@ -41,11 +44,17 @@ public class PessoaController {
 	@Autowired
 	private PessoaFisicaRepository pessoaFisicaRepository;
 	
+	@Autowired
+	private ServiceContagemAcessoApi serviceContagemAcessoApi;
+	
 	@ResponseBody
 	@GetMapping(value = "**/consultaPfNome/{nome}")
 	public ResponseEntity<List<PessoaFisica>> consultaPfNome(@PathVariable("nome") String nome){
 		
 		List<PessoaFisica> fisicas = pessoaFisicaRepository.pesquisaPorNomePF(nome.trim().toUpperCase());
+		
+		serviceContagemAcessoApi.atualizaAcessoEndPointPF();
+		
 		return new ResponseEntity<List<PessoaFisica>>(fisicas, HttpStatus.OK);
 	}
 	
@@ -82,11 +91,23 @@ public class PessoaController {
 	}
 	
 	@ResponseBody
+	@GetMapping(value = "**/consultaCnpjReceitaWs/{cnpj}")
+	public ResponseEntity<ConsultaCnpjDTO> consultaCnpjReceitaWs(@PathVariable("cnpj") String cnpj){
+		
+	  return new ResponseEntity<ConsultaCnpjDTO>(pessoaUserService.consultaCnpjReceitaWS(cnpj), HttpStatus.OK);
+		
+	}
+	
+	@ResponseBody
 	@PostMapping(value = "**/salvarPj")
 	public ResponseEntity<PessoaJuridica> salvarPj(@RequestBody @Valid PessoaJuridica pessoaJuridica) throws ExceptionLoja{
 		
 		if(pessoaJuridica == null) {
 			throw new ExceptionLoja("Pessoa Juridica não pode ser NULL");
+		}
+		
+		if(pessoaJuridica.getTipoPessoa() == null) {
+			throw new ExceptionLoja("Informe o tipo");
 		}
 		
 		if(pessoaJuridica.getId() == null && pessoaRepository.existeCnpjCadastrado(pessoaJuridica.getCnpj()) != null) {
@@ -139,6 +160,10 @@ public class PessoaController {
 		
 		if(pessoaFisica == null) {
 			throw new ExceptionLoja("Pessoa Fisica não pode ser NULL");
+		}
+		
+		if(pessoaFisica.getTipoPessoa() == null) {
+			pessoaFisica.setTipoPessoa(TipoPessoa.FISICA.name());
 		}
 		
 		if(pessoaFisica.getId() == null && pessoaRepository.existeCpfCadastrado(pessoaFisica.getCpf()) != null) {
