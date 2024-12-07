@@ -1,10 +1,15 @@
 package com.loja_v;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLDataException;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.mail.MessagingException;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,11 +24,15 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.loja_v.model.dto.ObjetoErroDTO;
+import com.loja_v.service.ServiceSendEmail;
 
 
 @RestControllerAdvice
 @ControllerAdvice
 public class ControleExcecoes extends ResponseEntityExceptionHandler{
+	
+	@Autowired
+	private ServiceSendEmail serviceSendEmail;
 	
 	public ResponseEntity<Object> handleExceptionCustom(ExceptionLoja ex){
 		ObjetoErroDTO objetoErroDTO = new ObjetoErroDTO();
@@ -61,6 +70,18 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler{
 		objetoErroDTO.setError(msg);
 		objetoErroDTO.setCode(status.value() + " ==> " + status.getReasonPhrase());
 		
+		try {
+			serviceSendEmail.enviarEmailHtml("Erro Loja V",
+					ExceptionUtils.getStackTrace(ex),
+					"lojanamidia@gmail.com");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			
+			e.printStackTrace();
+		}
+		
 		return new ResponseEntity<Object>(objetoErroDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
@@ -92,6 +113,18 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler{
 		
 		objetoErroDTO.setError(msg);
 		objetoErroDTO.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+		
+		try {
+			serviceSendEmail.enviarEmailHtml("Erro Loja V",
+					ExceptionUtils.getStackTrace(ex),
+					"lojanamidia@gmail.com");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			
+			e.printStackTrace();
+		}
 
 		return new ResponseEntity<Object>(objetoErroDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 
