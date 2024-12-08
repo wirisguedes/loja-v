@@ -15,6 +15,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 
 @Entity
@@ -28,9 +31,12 @@ public class Produto implements Serializable{
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_produto")
 	private Long id;
 	
+	@NotNull(message = "Tipo da unidade deve ser informado")
 	@Column(nullable = false)
 	private String tipoUnidade;
 	
+	@Size(min = 10, message = "Nome do produto deve ter mais de 10 letras")
+	@NotNull(message = "Nome do produto deve ser informado")
 	@Column(nullable = false)
 	private String nome;
 	
@@ -45,9 +51,11 @@ public class Produto implements Serializable{
 	 * Nota item nota produto - ASSOCIAR
 	 */
 
+	@NotNull(message = "Peso deve ser informado")
 	@Column(nullable = false)
 	private Double peso;
 	
+	@NotNull(message = "Largura deve ser informado")
 	@Column(nullable = false)
 	private Double largura;
 	
@@ -71,10 +79,36 @@ public class Produto implements Serializable{
 	
 	private Integer QtdClique = 0;
 	
+	@NotNull(message = "Empresa deve ser informada")
 	@ManyToOne(targetEntity = Pessoa.class)
 	@JoinColumn(name = "empresa_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_fk"))
-	private Pessoa empresa; 
+	private PessoaJuridica empresa; 
 	
+	@NotNull(message = "Categoria produto deve ser informada")
+	@ManyToOne(targetEntity = CategoriaProduto.class)
+	@JoinColumn(name = "categoria_produto_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "categoria_produto_fk"))
+	private CategoriaProduto categoriaProduto = new CategoriaProduto(); 
+	
+	@NotNull(message = "Marca produto deve ser informada")
+	@ManyToOne(targetEntity = MarcaProduto.class)
+	@JoinColumn(name = "marca_produto_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "marca_produto_fk"))
+	private MarcaProduto marcaProduto = new MarcaProduto(); 
+	
+	public MarcaProduto getMarcaProduto() {
+		return marcaProduto;
+	}
+	
+	public void setMarcaProduto(MarcaProduto marcaProduto) {
+		this.marcaProduto = marcaProduto;
+	}
+	
+	public CategoriaProduto getCategoriaProduto() {
+		return categoriaProduto;
+	}
+	
+	public void setCategoriaProduto(CategoriaProduto categoriaProduto) {
+		this.categoriaProduto = categoriaProduto;
+	}
 
 	public String getNome() {
 		return nome;
@@ -84,11 +118,11 @@ public class Produto implements Serializable{
 		this.nome = nome;
 	}
 
-	public Pessoa getEmpresa() {
+	public PessoaJuridica getEmpresa() {
 		return empresa;
 	}
 
-	public void setEmpresa(Pessoa empresa) {
+	public void setEmpresa(PessoaJuridica empresa) {
 		this.empresa = empresa;
 	}
 
