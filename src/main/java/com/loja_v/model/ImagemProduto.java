@@ -15,6 +15,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "imagem_produto")
@@ -34,20 +36,22 @@ public class ImagemProduto implements Serializable{
 	@Column(columnDefinition = "text", nullable = false)
 	private String imagemMiniatura;
 	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "produto_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "produto_fk"))
 	private Produto produto;
 	
-	@ManyToOne(targetEntity = Pessoa.class)
+	@JsonIgnore
+	@ManyToOne(targetEntity = PessoaJuridica.class)
 	@JoinColumn(name = "empresa_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_fk"))
-	private Pessoa empresa; 
+	private PessoaJuridica empresa; 
 	
 
-	public Pessoa getEmpresa() {
+	public PessoaJuridica getEmpresa() {
 		return empresa;
 	}
 
-	public void setEmpresa(Pessoa empresa) {
+	public void setEmpresa(PessoaJuridica empresa) {
 		this.empresa = empresa;
 	}
 
