@@ -20,9 +20,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -40,24 +43,28 @@ public abstract class Pessoa implements Serializable{
 	@NotNull(message = "Nome deve ser informado")
 	@Column(nullable = false)
 	private String nome;
-	
+
+
+	@Email
 	@Column(nullable = false)
 	private String email;
-	
+
+
 	@Column(nullable = false)
 	private String telefone;
 	
 	@Column
-	private String tipoPessoa;
+	private String tipoPessoa; 
 	
 	@OneToMany(mappedBy = "pessoa", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Endereco> enderecos = new ArrayList<Endereco>();
 	
+	
 	@ManyToOne(targetEntity = Pessoa.class)
-	@JoinColumn(name = "empresa_id", nullable = true, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_fk"))
-	private Pessoa empresa; 
-	
-	
+	@JoinColumn(name = "empresa_id", nullable = true, 
+	foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_id_fk"))
+	private Pessoa empresa;
+
 	public Pessoa getEmpresa() {
 		return empresa;
 	}
