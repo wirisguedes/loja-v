@@ -11,6 +11,11 @@ public class VendaService {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
+	
+	public void exclusaoLogica(Long idVenda) {
+		String sql = "begin; update venda_compra_loja set excluido = true where id = " + idVenda + "; commit;";
+		jdbcTemplate.execute(sql);
+	}
 
 
 	public void exclusaoTotalVendaBanco(Long idVenda) {
@@ -27,5 +32,10 @@ public class VendaService {
 		jdbcTemplate.execute(value);
 	}
 
+	
+	public void ativarRegistroVenda(Long idVenda) {
+		String sql = "begin; update venda_compra_loja set excluido = false where id = " + idVenda + "; commit;";
+		jdbcTemplate.execute(sql);
+	}
 
 }
