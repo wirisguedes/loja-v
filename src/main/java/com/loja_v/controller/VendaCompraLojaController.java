@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,12 +17,15 @@ import com.loja_v.ExceptionLoja;
 import com.loja_v.model.Endereco;
 import com.loja_v.model.ItemVendaLoja;
 import com.loja_v.model.PessoaFisica;
+import com.loja_v.model.StatusRastreio;
 import com.loja_v.model.VendaCompraLoja;
 import com.loja_v.model.dto.ItemVendaDTO;
 import com.loja_v.model.dto.VendaCompraLojaDTO;
 import com.loja_v.repository.EnderecoRepository;
 import com.loja_v.repository.NotaFiscalVendaRepository;
+import com.loja_v.repository.StatusRastreioRepository;
 import com.loja_v.repository.VendaCompraLojaRepository;
+import com.loja_v.service.VendaService;
 
 @RestController
 public class VendaCompraLojaController {
@@ -37,6 +41,12 @@ public class VendaCompraLojaController {
 	
 	@Autowired
 	private NotaFiscalVendaRepository notaFiscalVendaRepository;
+	
+	@Autowired
+	private StatusRastreioRepository statusRastreioRepository;
+	
+	@Autowired
+	private VendaService vendaService; 
 	
 	@ResponseBody
 	@PostMapping(value = "**/salvarVendaLoja")
@@ -65,6 +75,17 @@ public class VendaCompraLojaController {
 		
 		/*Salva primeiro a venda e todo os dados*/
 		vendaCompraLoja = vendaCompraLojaRepository.saveAndFlush(vendaCompraLoja);
+		
+		StatusRastreio statusRastreio = new StatusRastreio();
+		statusRastreio.setCentroDistribuicao("Loja Local");
+		statusRastreio.setCidade("Local");
+		statusRastreio.setEmpresa(vendaCompraLoja.getEmpresa());
+		statusRastreio.setEstado("Local");
+		statusRastreio.setStatus("Inicio Compra");
+		statusRastreio.setVendaCompraLoja(vendaCompraLoja);
+		
+		statusRastreioRepository.save(statusRastreio);
+
 		
 		/*Associa a venda gravada no banco com a nota fiscal*/
 		vendaCompraLoja.getNotaFiscalVenda().setVendaCompraLoja(vendaCompraLoja);
@@ -127,6 +148,16 @@ public class VendaCompraLojaController {
 
 
 		return new ResponseEntity<VendaCompraLojaDTO>(compraLojaVirtualDTO, HttpStatus.OK);
+	}
+
+	@ResponseBody
+	@DeleteMapping(value = "**/deleteVendaTotalBanco/{idVenda}")
+	public ResponseEntity<String> deleteVendaTotalBanco(@PathVariable(value = "idVenda") Long idVenda) {
+		
+		vendaService.exclusaoTotalVendaBanco(idVenda);
+		
+		return new ResponseEntity<String>("Venda excluida com sucesso.",HttpStatus.OK);
+		
 	}
 
 
