@@ -16,6 +16,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "status_rastreio")
 @SequenceGenerator(name = "seq_status_rastreio", sequenceName = "seq_status_rastreio", allocationSize = 1, initialValue = 1)
@@ -35,10 +37,12 @@ public class StatusRastreio implements Serializable{
 	
 	private String status;
 	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "venda_compra_loja_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "venda_compra_loja_fk"))
 	private VendaCompraLoja vendaCompraLoja;
 	
+	@JsonIgnore
 	@ManyToOne(targetEntity = PessoaJuridica.class)
 	@JoinColumn(name = "empresa_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.CONSTRAINT, name = "empresa_fk"))
 	private PessoaJuridica empresa; 

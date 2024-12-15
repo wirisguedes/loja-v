@@ -23,6 +23,10 @@ public interface VendaCompraLojaRepository extends JpaRepository<VendaCompraLoja
 	@Query(value = "select distinct(i.vendaCompraLoja) from ItemVendaLoja i "
 			+ " where i.vendaCompraLoja.excluido = false and upper(trim(i.produto.nome)) like %?1%")
 	List<VendaCompraLoja> vendaPorNomeProduto(String valor);
+	
+	@Query(value = "select distinct(i.vendaCompraLoja) from ItemVendaLoja i "
+			+ " where i.vendaCompraLoja.excluido = false and vendaCompraLoja.pessoa.id = ?1")
+	List<VendaCompraLoja> vendaPorCliente(Long idCliente);
 
 	@Query(value = "select distinct(i.vendaCompraLoja) from ItemVendaLoja i "
 			+ " where i.vendaCompraLoja.excluido = false and upper(trim(i.vendaCompraLoja.pessoa.nome)) like %?1%")
