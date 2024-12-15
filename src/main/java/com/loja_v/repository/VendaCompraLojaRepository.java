@@ -1,5 +1,6 @@
 package com.loja_v.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,5 +37,12 @@ public interface VendaCompraLojaRepository extends JpaRepository<VendaCompraLoja
 			+ " where i.vendaCompraLoja.excluido = false and upper(trim(i.vendaCompraLoja.enderecoEntrega.ruaLogra)) "
 			+ " like %?1%")
 	List<VendaCompraLoja> vendaPorEnderecoEntrega(String enderecoentrega);
+	
+	@Query(value="select distinct(i.vendaCompraLoja) from ItemVendaLoja i "
+			+ " where i.vendaCompraLoja.excluido = false "
+			+ " and i.vendaCompraLoja.dataVenda >= ?1 "
+			+ " and i.vendaCompraLoja.dataVenda <= ?2 ")
+	List<VendaCompraLoja> consultaVendaFaixaData(Date data1, Date data2);
+
 
 }

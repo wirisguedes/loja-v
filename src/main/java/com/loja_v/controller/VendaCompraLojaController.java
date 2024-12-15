@@ -1,5 +1,6 @@
 package com.loja_v.controller;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -281,5 +282,59 @@ public class VendaCompraLojaController {
 
 		return new ResponseEntity<List<VendaCompraLojaDTO>>(compraLojaDTOList, HttpStatus.OK);
 	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/consultaVendaDinamicaFaixaData/{data1}/{data2}")
+	public ResponseEntity<List<VendaCompraLojaDTO>> 
+	                            consultaVendaDinamicaFaixaData(
+	                            		@PathVariable("data1") String data1,
+	                            		@PathVariable("data2") String data2) throws ParseException{
+		
+		List<VendaCompraLoja> compraLoja = null;
+		
+		compraLoja = vendaService.consultaVendaFaixaData(data1, data2);
+		
+		
+		if (compraLoja == null) {
+			compraLoja = new ArrayList<VendaCompraLoja>();
+		}
+		
+		
+		
+         List<VendaCompraLojaDTO> compraLojaDTOList = new ArrayList<VendaCompraLojaDTO>();
+		
+		for (VendaCompraLoja vcl : compraLoja) {
+			
+			VendaCompraLojaDTO compraLojaDTO = new VendaCompraLojaDTO();
+	
+			compraLojaDTO.setValorTotal(vcl.getValorTotal());
+			compraLojaDTO.setPessoa(vcl.getPessoa());
+	
+			compraLojaDTO.setEntrega(vcl.getEnderecoEntrega());
+			compraLojaDTO.setCobranca(vcl.getEnderecoCobranca());
+	
+			compraLojaDTO.setValorDesc(vcl.getValorDesconto());
+			compraLojaDTO.setValorFrete(vcl.getValorFret());
+			compraLojaDTO.setId(vcl.getId());
+
+
+			for (ItemVendaLoja item : vcl.getItemVendaLojas()) {
+	
+				ItemVendaDTO itemVendaDTO = new ItemVendaDTO();
+				itemVendaDTO.setQuantidade(item.getQuantidade());
+				itemVendaDTO.setProduto(item.getProduto());
+	
+				compraLojaDTO.getItemVendaLoja().add(itemVendaDTO);
+			}
+			
+			compraLojaDTOList.add(compraLojaDTO);
+		
+		}
+
+
+		return new ResponseEntity<List<VendaCompraLojaDTO>>(compraLojaDTOList, HttpStatus.OK);
+		
+	}
+
 
 }
