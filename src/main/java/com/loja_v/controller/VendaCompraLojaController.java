@@ -225,4 +225,61 @@ public class VendaCompraLojaController {
 		return new ResponseEntity<List<VendaCompraLojaDTO>>(compraLojaDTOList, HttpStatus.OK);
 	}
 
+	@ResponseBody
+	@GetMapping(value = "**/consultaVendaDinamica/{valor}/{tipoconsulta}")
+	public ResponseEntity<List<VendaCompraLojaDTO>> consultaVendaDinamica(@PathVariable("valor") String valor,
+			@PathVariable("tipoconsulta") String tipoconsulta) {
+
+		List<VendaCompraLoja> compraLoja = null;
+
+		if (tipoconsulta.equalsIgnoreCase("POR_ID_PROD")) {
+
+			compraLoja = vendaCompraLojaRepository.vendaPorProduto(Long.parseLong(valor));
+
+		} else if (tipoconsulta.equalsIgnoreCase("POR_NOME_PROD")) {
+			compraLoja = vendaCompraLojaRepository.vendaPorNomeProduto(valor.toUpperCase().trim());
+		} else if (tipoconsulta.equalsIgnoreCase("POR_NOME_CLIENTE")) {
+			compraLoja = vendaCompraLojaRepository.vendaPorNomeCliente(valor.toUpperCase().trim());
+		} else if (tipoconsulta.equalsIgnoreCase("POR_ENDERECO_COBRANCA")) {
+			compraLoja = vendaCompraLojaRepository.vendaPorEndereCobranca(valor.toUpperCase().trim());
+		} else if (tipoconsulta.equalsIgnoreCase("POR_ENDERECO_ENTREGA")) {
+			compraLoja = vendaCompraLojaRepository.vendaPorEnderecoEntrega(valor.toUpperCase().trim());
+		}
+
+		if (compraLoja == null) {
+			compraLoja = new ArrayList<VendaCompraLoja>();
+		}
+
+		List<VendaCompraLojaDTO> compraLojaDTOList = new ArrayList<VendaCompraLojaDTO>();
+
+		for (VendaCompraLoja vcl : compraLoja) {
+
+			VendaCompraLojaDTO compraLojaDTO = new VendaCompraLojaDTO();
+
+			compraLojaDTO.setValorTotal(vcl.getValorTotal());
+			compraLojaDTO.setPessoa(vcl.getPessoa());
+
+			compraLojaDTO.setEntrega(vcl.getEnderecoEntrega());
+			compraLojaDTO.setCobranca(vcl.getEnderecoCobranca());
+
+			compraLojaDTO.setValorDesc(vcl.getValorDesconto());
+			compraLojaDTO.setValorFrete(vcl.getValorFret());
+			compraLojaDTO.setId(vcl.getId());
+
+			for (ItemVendaLoja item : vcl.getItemVendaLojas()) {
+
+				ItemVendaDTO itemVendaDTO = new ItemVendaDTO();
+				itemVendaDTO.setQuantidade(item.getQuantidade());
+				itemVendaDTO.setProduto(item.getProduto());
+
+				compraLojaDTO.getItemVendaLoja().add(itemVendaDTO);
+			}
+
+			compraLojaDTOList.add(compraLojaDTO);
+
+		}
+
+		return new ResponseEntity<List<VendaCompraLojaDTO>>(compraLojaDTOList, HttpStatus.OK);
+	}
+
 }
