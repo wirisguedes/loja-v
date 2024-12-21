@@ -15,8 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
-
-
+/*MINU */
 
 @SpringBootApplication
 @EnableAsync
