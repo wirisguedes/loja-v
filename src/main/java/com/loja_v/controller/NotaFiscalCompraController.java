@@ -20,6 +20,7 @@ import com.loja_v.ExceptionLoja;
 import com.loja_v.model.NotaFiscalCompra;
 import com.loja_v.model.NotaFiscalVenda;
 import com.loja_v.model.dto.ObejtoRequisicaoRelatorioProdCompraNotaFiscalDTO;
+import com.loja_v.model.dto.ObejtoRequisicaoRelatorioProdutoAlertaEstoqueDTO;
 import com.loja_v.repository.NotaFiscalCompraRepository;
 import com.loja_v.repository.NotaFiscalVendaRepository;
 import com.loja_v.service.NotaFiscalCompraService;
@@ -51,6 +52,18 @@ public class NotaFiscalCompraController {
 		
 	}
 
+	@ResponseBody
+	@PostMapping(value = "**/relatorioProdAlertaEstoque")
+	public ResponseEntity<List<ObejtoRequisicaoRelatorioProdutoAlertaEstoqueDTO>> relatorioProdAlertaEstoque(
+			@Valid @RequestBody ObejtoRequisicaoRelatorioProdutoAlertaEstoqueDTO obejtoRequisicaoRelatorioProdCompraNotaFiscalDto) {
+
+		List<ObejtoRequisicaoRelatorioProdutoAlertaEstoqueDTO> retorno = new ArrayList<ObejtoRequisicaoRelatorioProdutoAlertaEstoqueDTO>();
+
+		retorno = notaFiscalCompraService.gerarRelatorioAlertaEstoque(obejtoRequisicaoRelatorioProdCompraNotaFiscalDto);
+
+		return new ResponseEntity<List<ObejtoRequisicaoRelatorioProdutoAlertaEstoqueDTO>>(retorno, HttpStatus.OK);
+
+	}
 
 	@ResponseBody 
 	@PostMapping(value = "**/salvarNotaFiscalCompra")
