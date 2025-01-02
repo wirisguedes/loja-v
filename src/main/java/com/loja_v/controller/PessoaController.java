@@ -1,12 +1,14 @@
 package com.loja_v.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,13 +21,17 @@ import com.loja_v.enums.TipoPessoa;
 import com.loja_v.model.Endereco;
 import com.loja_v.model.PessoaFisica;
 import com.loja_v.model.PessoaJuridica;
+import com.loja_v.model.Usuario;
 import com.loja_v.model.dto.CepDTO;
 import com.loja_v.model.dto.ConsultaCnpjDTO;
+import com.loja_v.model.dto.ObjetoMsgGeral;
 import com.loja_v.repository.EnderecoRepository;
 import com.loja_v.repository.PessoaFisicaRepository;
 import com.loja_v.repository.PessoaRepository;
+import com.loja_v.repository.UsuarioRepository;
 import com.loja_v.service.PessoaUserService;
 import com.loja_v.service.ServiceContagemAcessoApi;
+import com.loja_v.service.ServiceSendEmail;
 import com.loja_v.util.ValidaCNPJ;
 import com.loja_v.util.ValidarCPF;
 
@@ -46,6 +52,12 @@ public class PessoaController {
 	
 	@Autowired
 	private ServiceContagemAcessoApi serviceContagemAcessoApi;
+	
+	@Autowired
+	private UsuarioRepository usuarioRepository;
+	
+	@Autowired
+	private ServiceSendEmail serviceSendEmail;
 	
 	@ResponseBody
 	@GetMapping(value = "**/consultaPfNome/{nome}")
@@ -152,6 +164,35 @@ public class PessoaController {
 		pessoaJuridica = pessoaUserService.salvarPessoaJuridica(pessoaJuridica);
 		
 		return new ResponseEntity<PessoaJuridica>(pessoaJuridica, HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@PostMapping(value = "**/recuperarSenha")
+	public ResponseEntity<ObjetoMsgGeral> recuperarAcesso(@RequestBody String login) throws Exception {
+		
+		Usuario usuario = usuarioRepository.findUserByLogin(login);
+		
+		if (usuario == null) {
+			return new ResponseEntity<ObjetoMsgGeral>(new ObjetoMsgGeral("Usuário não encontrado"), HttpStatus.OK);
+		}
+		
+		String senha = UUID.randomUUID().toString();
+		
+		senha = senha.substring(0, 6);
+		
+		String senhaCriptografada = new BCryptPasswordEncoder().encode(senha);
+		
+		usuarioRepository.updateSenhaUser(senhaCriptografada, login);
+		
+		StringBuilder msgEmail = new StringBuilder();
+		msgEmail.append("<b>Nova senha é:</b>")
+		.append(senha);
+		
+		serviceSendEmail.enviarEmailHtml("Sua nova senha", msgEmail.toString(), usuario.getPessoa().getEmail());
+		
+		
+		return new ResponseEntity<ObjetoMsgGeral>(new ObjetoMsgGeral("Senha enviada para o seu e-mail"), HttpStatus.OK);
+		
 	}
 	
 	@ResponseBody

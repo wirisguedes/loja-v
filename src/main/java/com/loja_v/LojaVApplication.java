@@ -11,11 +11,9 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 
-
-/*MINU */
 
 @SpringBootApplication
 @EnableAsync
@@ -27,8 +25,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class LojaVApplication implements AsyncConfigurer  {
 
 	public static void main(String[] args) {
-		
-//		System.out.println(new BCryptPasswordEncoder().encode("123")); /*Gerar senha crip*/
 		
 		SpringApplication.run(LojaVApplication.class, args);
 	}
@@ -47,6 +43,18 @@ public class LojaVApplication implements AsyncConfigurer  {
 		
 		return executor;
 	}
+	
+//	@Override
+//	public void addCorsMappings(CorsRegistry registry) {
+//		
+//		registry.addMapping("/**")
+//		.allowedOrigins("*")
+//		.allowedHeaders("*")
+//		.allowedMethods("*")
+//		.exposedHeaders("*");
+//		
+//		//WebMvcConfigurer.super.addCorsMappings(registry);
+//	}
 
  
 }

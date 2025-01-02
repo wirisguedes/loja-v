@@ -30,20 +30,21 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter implements H
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 		.disable().authorizeRequests().antMatchers("/").permitAll()
-		.antMatchers("/index").permitAll()
-		.antMatchers(HttpMethod.POST, "/requisicaojunoboleto/**", "/notificacaoapiv2").permitAll()
-		.antMatchers(HttpMethod.GET, "/requisicaojunoboleto/**", "/notificacaoapiv2").permitAll()
+		.antMatchers("/index","/pagamento/**","/resources/**","/static/**","/templates/**","classpath:/static/**","classpath:/resources/**","classpath:/templates/**").permitAll()
+		.antMatchers(HttpMethod.POST, "/requisicaojunoboleto/**", "/notificacaoapiv2","/pagamento/**","/resources/**","/static/**","/templates/**","classpath:/static/**","classpath:/resources/**","classpath:/templates/**","/recuperarSenha","/criaAcesso").permitAll()
+		.antMatchers(HttpMethod.GET, "/requisicaojunoboleto/**", "/notificacaoapiv2","/pagamento/**","/resources/**","/static/**","/templates/**","classpath:/static/**","classpath:/resources/**","classpath:/templates/**","/recuperarSenha","/criaAcesso").permitAll()
 		.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 		
-		/*Redireciona ou da retorno para index quando deslogar*/
+		/* redireciona ou da um retorno para index quando desloga*/
 		.anyRequest().authenticated().and().logout().logoutSuccessUrl("/index")
 		
-		/*Mapeia logout do sistema*/
+		/*mapeia o logout do sistema*/
 		.logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
 		
-		/*Filtrar as requisições para login de JWT*/
-		.and().addFilterAfter(new JWTLoginFilter("/login", authenticationManager()), 
+		/*Filtra as requisicoes para login de JWT*/
+		.and().addFilterAfter(new JWTLoginFilter("/login", authenticationManager()),
 				UsernamePasswordAuthenticationFilter.class)
+		
 		.addFilterBefore(new JWTApiAutenticacaoFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 	
@@ -58,9 +59,14 @@ public class WebConfigSecurity extends WebSecurityConfigurerAdapter implements H
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().
-		    antMatchers(HttpMethod.GET, "/requisicaojunoboleto/**", "/notificacaoapiv2")
-		   .antMatchers(HttpMethod.POST,"/requisicaojunoboleto/**", "/notificacaoapiv2");
-		/* Ingnorando URL no momento para nao autenticar */
+	    antMatchers(HttpMethod.GET, "/requisicaojunoboleto/**", "/notificacaoapiv2","/pagamento/**","/resources/**",
+	    		"/static/**","/templates/**","classpath:/static/**","classpath:/resources/**",
+	    		"classpath:/templates/**","/webjars/**","/WEB-INF/classes/static/**","/recuperarSenha","/criaAcesso")
+	   .antMatchers(HttpMethod.POST,"/requisicaojunoboleto/**", "/notificacaoapiv2",
+			   "/pagamento/**","/resources/**","/static/**","/templates/**",
+			   "classpath:/static/**","classpath:/resources/**","classpath:/templates/**",
+			   "/webjars/**","/WEB-INF/classes/static/**","/recuperarSenha","/criaAcesso");
+	/* Ingnorando URL no momento para nao autenticar */
 	}
 
 
