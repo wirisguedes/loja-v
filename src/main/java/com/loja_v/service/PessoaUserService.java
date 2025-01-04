@@ -4,6 +4,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 
 import javax.mail.MessagingException;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.swing.text.html.parser.Entity;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,7 +42,22 @@ public class PessoaUserService {
 	@Autowired
 	private PessoaFisicaRepository pessoaFisicaRepository;
 	
+	@PersistenceContext
+	private EntityManager entityManager;
 	
+	public Boolean possuiAcesso(String username, String acessos) {
+
+		String sql = " select count(1) > 0 from usuarios_acesso as ua "
+				+ " inner join usuario as u on u.id = ua.usuario_id "
+				+ " inner join acesso as a on a.id = ua.acesso_id " + " where u.login = '" + username + "' "
+				+ " and a.descricao in (" + acessos + ")";
+
+		Query query = entityManager.createNativeQuery(sql);
+
+		return Boolean.valueOf(query.getSingleResult().toString());
+
+	}
+		
 	public PessoaJuridica salvarPessoaJuridica(PessoaJuridica pessoaJuridica) {
 	
 		for (int i = 0; i< pessoaJuridica.getEnderecos().size(); i++) {
