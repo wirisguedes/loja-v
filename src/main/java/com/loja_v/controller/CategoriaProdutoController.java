@@ -24,12 +24,21 @@ public class CategoriaProdutoController {
 	private CategoriaProdutoRepository categoriaProdutoRepository; 
 	
 	@ResponseBody
-	@GetMapping(value = "**/buscarPorDescCatgoria/{desc}")
-	public ResponseEntity<List<CategoriaProduto>> buscarPorDesc(@PathVariable("desc") String desc) { 
+	@GetMapping(value = "**/buscarPorId/{id}")
+	public ResponseEntity<CategoriaProduto> buscarPorDesc(@PathVariable("id") Long id) { 
 		
-		List<CategoriaProduto> acesso = categoriaProdutoRepository.buscarCategoriaDes(desc.toUpperCase());
+		CategoriaProduto categoriaProduto = categoriaProdutoRepository.findById(id).get();
 		
-		return new ResponseEntity<List<CategoriaProduto>>(acesso,HttpStatus.OK);
+		return new ResponseEntity<CategoriaProduto>(categoriaProduto,HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/listarCategoriaProduto/{codEmpresa}")
+	public ResponseEntity<List<CategoriaProduto>> listarCategoriaProduto(@PathVariable("codEmpresa") Long codEmpresa) { 
+		
+		List<CategoriaProduto> categoriaProduto = categoriaProdutoRepository.findAll(codEmpresa);
+		
+		return new ResponseEntity<List<CategoriaProduto>>(categoriaProduto,HttpStatus.OK);
 	}
 
 

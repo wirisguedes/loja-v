@@ -44,45 +44,35 @@ public class ControleExcecoes extends ResponseEntityExceptionHandler{
 	}
 
 	/*Captura exceções do projeto*/
-	@ExceptionHandler({Exception.class, RuntimeException.class, Throwable.class})
-	@Override
-	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
-			HttpStatus status, WebRequest request) {
-		
+	@ExceptionHandler({ Exception.class, RuntimeException.class, Throwable.class })
+	public ResponseEntity<Object> handleCustomException(Exception ex, WebRequest request) {
 		ObjetoErroDTO objetoErroDTO = new ObjetoErroDTO();
-		
 		String msg = "";
-		
-		if(ex instanceof MethodArgumentNotValidException) {
+
+		if (ex instanceof MethodArgumentNotValidException) {
 			List<ObjectError> list = ((MethodArgumentNotValidException) ex).getBindingResult().getAllErrors();
-			
-			for(ObjectError objectError : list) {
+
+			for (ObjectError objectError : list) {
 				msg += objectError.getDefaultMessage() + "\n";
 			}
-		}else if(ex instanceof HttpMessageNotReadableException) {
-			
+		} else if (ex instanceof HttpMessageNotReadableException) {
+
 			msg = "Não está sendo enviado dados para o BODY corpo da requisição";
-		}
-		else{
+		} else {
 			msg = ex.getMessage();
 		}
-		
+
 		objetoErroDTO.setError(msg);
-		objetoErroDTO.setCode(status.value() + " ==> " + status.getReasonPhrase());
-		
+		objetoErroDTO.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value() + " ==> "
+				+ HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+
 		try {
-			serviceSendEmail.enviarEmailHtml("Erro Loja V",
-					ExceptionUtils.getStackTrace(ex),
-					"lojanamidia@gmail.com");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (MessagingException e) {
-			
+			serviceSendEmail.enviarEmailHtml("Erro Loja V", ExceptionUtils.getStackTrace(ex), "lojanamidia@gmail.com");
+		} catch (UnsupportedEncodingException | MessagingException e) {
 			e.printStackTrace();
 		}
-		
-		return new ResponseEntity<Object>(objetoErroDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		return new ResponseEntity<>(objetoErroDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler({DataIntegrityViolationException.class,

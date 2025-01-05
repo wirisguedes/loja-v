@@ -55,8 +55,13 @@ public class JWTTokenAutenticacaoService {
 		
 		liberacaoCors(response);
 		
+
+		Usuario usuario = ApplicationContextLoad.
+				getApplicationContext().
+				getBean(UsuarioRepository.class).findUserByLogin(username);
+						
 		/*Usado para ver no Postman para teste*/
-		response.getWriter().write("{\"Authorization\": \"" + token + "\",\"username\":\""+username+"\"}");
+		response.getWriter().write("{\"Authorization\": \"" + token + "\",\"username\":\""+username+"\",\"empresa\":\""+usuario.getEmpresa().getId()+"\"}");
 		
 	}
 	
