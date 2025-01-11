@@ -1,8 +1,12 @@
 package com.loja_v.controller;
 
 import java.util.List;
+import com.google.gson.Gson;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +28,51 @@ public class CategoriaProdutoController {
 	private CategoriaProdutoRepository categoriaProdutoRepository; 
 	
 	@ResponseBody
+	@GetMapping(value = "**/listaPorPageCategoriaProduto/{idEmpresa}/{pagina}")
+	public ResponseEntity<List<CategoriaProduto>> page(@PathVariable("idEmpresa") Long idEmpresa,
+			@PathVariable("pagina") Integer pagina){
+		
+		Pageable pageable = PageRequest.of(pagina, 5, Sort.by("nomeDesc"));
+		
+		List<CategoriaProduto> lista = categoriaProdutoRepository.findPorPage(idEmpresa, pageable); 
+		
+		return new ResponseEntity<List<CategoriaProduto>>(lista, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "**qtdPaginaCategoriaProduto/{idEmpresa}")
+	public ResponseEntity<Integer> qtdPagina(@PathVariable("idEmpresa") Long idEmpresa){
+		
+		Integer qtdPagina = categoriaProdutoRepository.qtdPagina(idEmpresa);
+		
+		return new ResponseEntity<Integer>(qtdPagina, HttpStatus.OK);
+	}
+	
+	@ResponseBody
 	@GetMapping(value = "**/buscarPorId/{id}")
 	public ResponseEntity<CategoriaProduto> buscarPorDesc(@PathVariable("id") Long id) { 
 		
 		CategoriaProduto categoriaProduto = categoriaProdutoRepository.findById(id).get();
 		
 		return new ResponseEntity<CategoriaProduto>(categoriaProduto,HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/buscarPorDescCatgoria/{desc}/{empresa}")
+	public ResponseEntity<List<CategoriaProduto>> buscarPorDesc2(@PathVariable("desc") String desc,
+			@PathVariable("empresa") Long empresa) { 
+		
+		List<CategoriaProduto> acesso = categoriaProdutoRepository.buscarCategoriaDes(desc.toUpperCase(), empresa);
+		
+		return new ResponseEntity<List<CategoriaProduto>>(acesso,HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/buscarPorDescCatgoria/{desc}")
+	public ResponseEntity<List<CategoriaProduto>> buscarPorDesc(@PathVariable("desc") String desc) { 
+		
+		List<CategoriaProduto> acesso = categoriaProdutoRepository.buscarCategoriaDes(desc.toUpperCase());
+		
+		return new ResponseEntity<List<CategoriaProduto>>(acesso,HttpStatus.OK);
 	}
 	
 	@ResponseBody
@@ -44,15 +87,15 @@ public class CategoriaProdutoController {
 
 	@ResponseBody /*Poder dar um retorno da API*/
 	@PostMapping(value = "**/deleteCategoria") /*Mapeando a url para receber JSON*/
-	public ResponseEntity<?> deleteCategoria(@RequestBody CategoriaProduto categoriaProduto) { /*Recebe o JSON e converte pra Objeto*/
+	public ResponseEntity<?> deleteCategoria(@RequestBody CategoriaProduto categoriaProduto) throws ExceptionLoja { /*Recebe o JSON e converte pra Objeto*/
 		
 		if (categoriaProdutoRepository.findById(categoriaProduto.getId()).isPresent() == false) {
-			return new ResponseEntity("Categoria já foi removida",HttpStatus.OK);
+			throw new ExceptionLoja("Categoria já foi removida");
 		}
 		
 		categoriaProdutoRepository.deleteById(categoriaProduto.getId());
 		
-		return new ResponseEntity("Categoria Removida",HttpStatus.OK);
+		return new ResponseEntity<String>(new Gson().toJson("Categoria Removida"),HttpStatus.OK);
 	}
 
 
