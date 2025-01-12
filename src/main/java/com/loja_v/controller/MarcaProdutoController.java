@@ -5,6 +5,9 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
 import com.loja_v.ExceptionLoja;
 import com.loja_v.model.MarcaProduto;
 import com.loja_v.repository.MarcaRepository;
@@ -30,6 +34,37 @@ public class MarcaProdutoController {
 	
 	@Autowired
 	private MarcaRepository marcaRepository;
+	
+	@ResponseBody
+	@GetMapping(value = "**/listaPorPageMarcaProduto/{idEmpresa}/{pagina}")
+	public ResponseEntity<List<MarcaProduto>> page(@PathVariable("idEmpresa") Long idEmpresa,
+			@PathVariable("pagina") Integer pagina){
+		
+		Pageable pageable = PageRequest.of(pagina, 5, Sort.by("nomeDesc"));
+		
+		List<MarcaProduto> lista = marcaRepository.findPorPage(idEmpresa, pageable); 
+		
+		return new ResponseEntity<List<MarcaProduto>>(lista, HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/buscarPorDescMarca/{desc}/{empresa}")
+	public ResponseEntity<List<MarcaProduto>> buscarPorMarca(@PathVariable("desc") String desc,
+			@PathVariable("empresa") Long empresa) { 
+		
+		List<MarcaProduto> lista = marcaRepository.buscarMarcaDes(desc.toUpperCase(), empresa);
+		
+		return new ResponseEntity<List<MarcaProduto>>(lista,HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/qtdPaginaMarcaProduto/{idEmpresa}")
+	public ResponseEntity<Integer> qtdPagina(@PathVariable("idEmpresa") Long idEmpresa){
+		
+		Integer qtdPagina = marcaRepository.qtdPagina(idEmpresa);
+		
+		return new ResponseEntity<Integer>(qtdPagina, HttpStatus.OK);
+	}
 	
 	@ResponseBody 
 	@PostMapping(value = "**/salvarMarca") 
@@ -48,10 +83,10 @@ public class MarcaProdutoController {
 	
 	@ResponseBody 
 	@PostMapping(value = "**/deletaMarca") 
-	public ResponseEntity<?> deletaMarca(@RequestBody MarcaProduto marcaProduto) { 
+	public ResponseEntity<String> deletaMarca(@RequestBody MarcaProduto marcaProduto) { 
 		
 		marcaRepository.deleteById(marcaProduto.getId());
-		return new ResponseEntity("Marca produto removida", HttpStatus.OK);
+		return new ResponseEntity<String>(new Gson().toJson("Marca produto removida"), HttpStatus.OK);
 	}
 	
 	
