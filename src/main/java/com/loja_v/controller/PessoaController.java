@@ -6,6 +6,9 @@ import java.util.UUID;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,8 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.gson.Gson;
 import com.loja_v.ExceptionLoja;
 import com.loja_v.enums.TipoPessoa;
+import com.loja_v.model.Acesso;
 import com.loja_v.model.Endereco;
 import com.loja_v.model.PessoaFisica;
 import com.loja_v.model.PessoaJuridica;
@@ -58,6 +63,9 @@ public class PessoaController {
 	
 	@Autowired
 	private ServiceSendEmail serviceSendEmail;
+	
+	@Autowired
+	private PessoaRepository pesssoaRepository;
 	
 	@ResponseBody
 	@GetMapping(value = "**/consultaPfNome/{nome}")
@@ -232,5 +240,55 @@ public class PessoaController {
 		
 		return new ResponseEntity<PessoaFisica>(pessoaFisica, HttpStatus.OK);
 	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/listaPorPagePj/{idEmpresa}/{pagina}")
+	public ResponseEntity<List<PessoaJuridica>> pagePj(@PathVariable("idEmpresa") Long idEmpresa,
+			@PathVariable("pagina") Integer pagina){
+		
+		Pageable pageable = PageRequest.of(pagina, 5, Sort.by("nomeFantasia"));
+		
+		List<PessoaJuridica> lista = pessoaRepository.findPorPage(idEmpresa, pageable); 
+		
+		return new ResponseEntity<List<PessoaJuridica>>(lista, HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/qtdPaginaPj/{idEmpresa}")
+	public ResponseEntity<Integer> qtdPaginaPj(@PathVariable("idEmpresa") Long idEmpresa){
+		
+		Integer qtdPagina = pessoaRepository.qtdPagina(idEmpresa);
+		
+		return new ResponseEntity<Integer>(qtdPagina, HttpStatus.OK);
+	}
 
+	@ResponseBody
+	@GetMapping(value = "**/buscarPorNomePj/{desc}/{empresa}")
+	public ResponseEntity<List<PessoaJuridica>> buscarPorNomePj(@PathVariable("desc") String desc,
+			@PathVariable("empresa") Long empresa) { 
+		
+		List<PessoaJuridica> acesso = pessoaRepository.buscarPessoaJuridicaDesc(desc.toUpperCase(), empresa);
+		
+		return new ResponseEntity<List<PessoaJuridica>>(acesso,HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/buscarPjId/{id}")
+	public ResponseEntity<PessoaJuridica> buscarPjId(@PathVariable("id") Long idPj) { 
+		
+		PessoaJuridica pessoaJuridica = pessoaRepository.findById(idPj).get();
+		
+		return new ResponseEntity<PessoaJuridica>(pessoaJuridica,HttpStatus.OK);
+	}
+	
+	@ResponseBody 
+	@PostMapping(value = "**/deletePessoaJuridica")
+	public ResponseEntity<String> deletePessoaJuridica(@RequestBody PessoaJuridica pessoaJuridica) { 
+		
+		usuarioRepository.deleteAcessoUserByPessoa(pessoaJuridica.getId());
+		usuarioRepository.deleteByPessoa(pessoaJuridica.getId());
+		pesssoaRepository.deleteById(pessoaJuridica.getId());
+		
+		return new ResponseEntity<String>(new Gson().toJson("PJ Removido"),HttpStatus.OK);
+	}
 }

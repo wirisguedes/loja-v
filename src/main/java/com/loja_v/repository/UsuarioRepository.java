@@ -26,10 +26,8 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long>{
 	@Query(value = "select u from Usuario u where u.pessoa.id = ?1 or u.login =?2")
 	Usuario findUserByPessoa(Long id, String email);
 
-
 	@Query(value = "select constraint_name from information_schema.constraint_column_usage where table_name = 'usuarios_acesso' and column_name = 'acesso_id' and constraint_name <> 'unique_acesso_user';", nativeQuery = true)
 	String consultaConstraintAcesso();
-
 
 	@Transactional
 	@Modifying
@@ -45,5 +43,15 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long>{
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE Usuario u SET u.senha = ?1 WHERE u.login = ?2")
 	void updateSenhaUser(String senha, String login);
+	
+	@Transactional
+	@Modifying(flushAutomatically = true)
+	@Query(value = "delete from usuarios_acesso where usuario_id in (select distinct usuario_id from usuarios_acesso  where usuario_id in (select id from usuario where pessoa_id = ?1))", nativeQuery = true)
+	void deleteAcessoUserByPessoa(Long idPessoa);
+	
+	@Transactional
+	@Modifying(flushAutomatically = true)
+	@Query(value = "delete from usuario where pessoa_id = ?1", nativeQuery = true)
+	void deleteByPessoa(Long idEmpresa);
 
 }
