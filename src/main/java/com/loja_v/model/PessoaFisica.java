@@ -11,6 +11,8 @@ import javax.persistence.TemporalType;
 
 import org.hibernate.validator.constraints.br.CPF;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 @Table(name = "pessoa_fisica")
 @PrimaryKeyJoinColumn(name = "id")
@@ -22,6 +24,7 @@ public class PessoaFisica extends Pessoa{
 	@Column(nullable = false)
 	private String cpf;
 	
+	@JsonFormat(pattern = "dd/MM/yyyy", shape = JsonFormat.Shape.STRING)
 	@Temporal(TemporalType.DATE)
 	private Date dataNascimento;
 
