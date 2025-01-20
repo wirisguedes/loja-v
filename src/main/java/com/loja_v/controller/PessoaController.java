@@ -77,6 +77,17 @@ public class PessoaController {
 
 		return new ResponseEntity<List<PessoaFisica>>(fisicas, HttpStatus.OK);
 	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@ResponseBody
+	@GetMapping(value = "**/listUserByEmpresa/{idEmpresa}")
+	public ResponseEntity<List<Usuario>> listUserByEmpresa(@PathVariable("idEmpresa") Long idEmpresa){
+		
+		List<Usuario> usuarios = usuarioRepository.listUserByEmpresa(idEmpresa);
+		
+		return new ResponseEntity(usuarios, HttpStatus.OK);
+		
+	}
 
 	@ResponseBody
 	@GetMapping(value = "**/consultaPfCpf/{cpf}")
