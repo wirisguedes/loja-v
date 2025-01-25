@@ -34,8 +34,8 @@ public class AcessoController {
 	@Autowired
 	private AcessoRepository acessoRepository;
 	
-	@ResponseBody //Poder da um retorno da API
-	@PostMapping(value = "**/salvarAcesso") // Mapeando a url para receber JSON
+	@ResponseBody 
+	@PostMapping(value = "**/salvarAcesso") 
 	public ResponseEntity<Acesso> salvarAcesso(@RequestBody Acesso acesso) throws ExceptionLoja { //Recebe o JSON e converte para objeto
 		
 		if(acesso.getId() == null) {
@@ -49,7 +49,7 @@ public class AcessoController {
 		return new ResponseEntity<Acesso>(acessoSalvo, HttpStatus.OK);
 	}
 	
-	@ResponseBody //Poder da um retorno da API
+	@ResponseBody 
 	@PostMapping(value = "**/deletaAcesso") // Mapeando a url para receber JSON
 	public ResponseEntity<String> deletaAcesso(@RequestBody Acesso acesso) { //Recebe o JSON e converte para objeto
 		
@@ -97,6 +97,15 @@ public class AcessoController {
 		Pageable pageable = PageRequest.of(pagina, 5, Sort.by("descricao"));
 		
 		List<Acesso> lista = acessoRepository.findPorPage(idEmpresa, pageable); 
+		
+		return new ResponseEntity<List<Acesso>>(lista, HttpStatus.OK);
+	}
+	
+	@ResponseBody
+	@GetMapping(value = "**/listaAcessoPorEmpresa/{idEmpresa}")
+	public ResponseEntity<List<Acesso>> listaAcesso(@PathVariable("idEmpresa") Long idEmpresa){		
+		
+		List<Acesso> lista = acessoRepository.findAcessos(idEmpresa);
 		
 		return new ResponseEntity<List<Acesso>>(lista, HttpStatus.OK);
 	}

@@ -370,4 +370,76 @@ public class PessoaController {
 
 		return new ResponseEntity<String>(new Gson().toJson("PF Removido"), HttpStatus.OK);
 	}
+	
+	
+	@ResponseBody
+	@GetMapping(value = "**/userById/{idUser}")
+	public ResponseEntity<Usuario> userById(@PathVariable("idUser") Long idUser){
+		
+		Usuario usuario = usuarioRepository.findById(idUser).get();
+		
+		return new ResponseEntity(usuario, HttpStatus.OK);
+		
+	}
+	
+	@ResponseBody
+	@PostMapping(value = "**/updateUserPessoa")
+	public ResponseEntity<String> updateUserPessoa(@RequestBody Usuario usuario) {
+
+		usuarioRepository.updateLoginUser(usuario.getLogin(), usuario.getId());
+		
+		boolean senhaIgual = usuarioRepository.senhaIgual(usuario.getSenha(), usuario.getId());
+		if(!senhaIgual) {
+			String senhaCripto = new BCryptPasswordEncoder().encode(usuario.getSenha());
+			usuarioRepository.updateSenhaUserId(senhaCripto, usuario.getId());
+		}
+		
+		return new ResponseEntity<String>(new Gson().toJson("User atualizado"), HttpStatus.OK);
+	}
+
+	@ResponseBody
+	@PostMapping(value = "**/adicionarRemoverAcesso")
+	public ResponseEntity<String> adicionarRemoverAcesso(@RequestBody String params){
+		
+		String[] paramAcesso = params.split("-");
+		
+		Long idAcesso = Long.parseLong(paramAcesso[0]);
+		Long idUser = Long.parseLong(paramAcesso[1]);
+		
+		Boolean possuiAcesso = usuarioRepository.possuiAcesso(idAcesso, idUser);
+		
+		if(possuiAcesso) {
+			usuarioRepository.deleteByAcesso(idAcesso, idUser);
+		}else {
+			usuarioRepository.addAcesso(idAcesso, idUser);
+		}
+		
+		return new ResponseEntity<String>(new Gson().toJson("User atualizado"), HttpStatus.OK);
+		
+	}
+	
+	@ResponseBody
+	@PostMapping(value = "**/removerUserPessoa")
+	public ResponseEntity<String> removerUserPessoa(@RequestBody Long idUser){
+		
+		Usuario usuario = usuarioRepository.findById(idUser).get();
+		
+		usuarioRepository.deleteAcessoUserByPessoa(usuario.getPessoa().getId());
+		usuarioRepository.deleteByPessoa(usuario.getPessoa().getId());
+		
+		return new ResponseEntity<String>(new Gson().toJson("User removido"), HttpStatus.OK);
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

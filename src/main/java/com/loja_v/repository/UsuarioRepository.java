@@ -48,6 +48,22 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long>{
 	void updateSenhaUser(String senha, String login);
 	
 	@Transactional
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE Usuario u SET u.senha = ?1 WHERE u.id = ?2")
+	void updateSenhaUserId(String senha, Long id);
+	
+	@Transactional
+	@Modifying(clearAutomatically = true)
+	@Query("UPDATE Usuario u SET u.login = ?1 WHERE u.id = ?2")
+	void updateLoginUser(String login, Long id);
+	
+	@Query(nativeQuery = true, value = "select count(1) > 0 from usuario where senha = ?1 and id = ?2")
+	Boolean senhaIgual(String senha, Long id);
+	
+	@Query(nativeQuery = true, value = "select count(1) > 0 from usuarios_acesso where acesso_id = ?1 and usuario_id = ?2")
+	Boolean possuiAcesso(Long idAcesso, Long idUser);
+	
+	@Transactional
 	@Modifying(flushAutomatically = true)
 	@Query(value = "delete from usuarios_acesso where usuario_id in (select distinct usuario_id from usuarios_acesso  where usuario_id in (select id from usuario where pessoa_id = ?1))", nativeQuery = true)
 	void deleteAcessoUserByPessoa(Long idPessoa);
@@ -56,5 +72,15 @@ public interface UsuarioRepository extends CrudRepository<Usuario, Long>{
 	@Modifying(flushAutomatically = true)
 	@Query(value = "delete from usuario where pessoa_id = ?1", nativeQuery = true)
 	void deleteByPessoa(Long idEmpresa);
+
+	@Transactional
+	@Modifying(flushAutomatically = true)
+	@Query(value = "delete from usuarios_acesso where acesso_id = ?1 and usuario_id = ?2", nativeQuery = true)
+	void deleteByAcesso(Long idAcesso, Long idUser);
+
+	@Transactional
+	@Modifying(flushAutomatically = true)
+	@Query(value = "INSERT INTO usuarios_acesso(acesso_id, usuario_id) VALUES (?1, ?2)", nativeQuery = true)
+	void addAcesso(Long idAcesso, Long idUser);
 
 }
